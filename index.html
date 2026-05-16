@@ -1,0 +1,1436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>APEX FITNESS — Elevate Your Performance</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap');
+
+  :root {
+    --bg: #080b10;
+    --bg2: #0d1117;
+    --bg3: #111820;
+    --surface: rgba(255,255,255,0.04);
+    --surface2: rgba(255,255,255,0.07);
+    --border: rgba(255,255,255,0.08);
+    --accent: #e8f53c;
+    --accent2: #39ff8f;
+    --accent3: #ff4d6d;
+    --text: #f0f2f5;
+    --text2: #8b92a5;
+    --text3: #5a6070;
+    --glow: rgba(232,245,60,0.15);
+    --glow2: rgba(57,255,143,0.12);
+    --red-glow: rgba(255,77,109,0.15);
+    --radius: 16px;
+    --radius-lg: 24px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ── LOADER ── */
+  #loader {
+    position: fixed; inset: 0; z-index: 9999;
+    background: var(--bg);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    transition: opacity 0.6s ease, visibility 0.6s ease;
+  }
+  #loader.hide { opacity: 0; visibility: hidden; }
+  .loader-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3rem, 8vw, 6rem);
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    animation: loaderPulse 1s ease-in-out infinite alternate;
+  }
+  .loader-bar-wrap {
+    width: 200px; height: 2px;
+    background: var(--border);
+    border-radius: 2px;
+    margin-top: 24px; overflow: hidden;
+  }
+  .loader-bar {
+    height: 100%; background: var(--accent);
+    border-radius: 2px;
+    animation: loaderFill 1.8s ease forwards;
+  }
+  @keyframes loaderPulse { from { opacity: 0.5; } to { opacity: 1; } }
+  @keyframes loaderFill { from { width: 0; } to { width: 100%; } }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 2px; }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+    padding: 0 clamp(1rem, 4vw, 3rem);
+    height: 72px;
+    display: flex; align-items: center; justify-content: space-between;
+    transition: background 0.4s, backdrop-filter 0.4s, border-color 0.4s;
+    border-bottom: 1px solid transparent;
+  }
+  nav.scrolled {
+    background: rgba(8,11,16,0.85);
+    backdrop-filter: blur(20px);
+    border-color: var(--border);
+  }
+  .nav-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.8rem; letter-spacing: 0.12em;
+    color: var(--accent); text-decoration: none;
+  }
+  .nav-logo span { color: var(--text); }
+  .nav-links {
+    display: flex; gap: 2.5rem; list-style: none;
+  }
+  .nav-links a {
+    color: var(--text2); text-decoration: none;
+    font-size: 0.875rem; font-weight: 500; letter-spacing: 0.04em;
+    transition: color 0.25s;
+    position: relative;
+  }
+  .nav-links a::after {
+    content: ''; position: absolute; bottom: -4px; left: 0; right: 0;
+    height: 1px; background: var(--accent);
+    transform: scaleX(0); transition: transform 0.25s;
+  }
+  .nav-links a:hover { color: var(--text); }
+  .nav-links a:hover::after { transform: scaleX(1); }
+  .nav-cta {
+    background: var(--accent); color: var(--bg);
+    padding: 0.5rem 1.5rem; border-radius: 50px;
+    font-size: 0.875rem; font-weight: 600;
+    text-decoration: none; letter-spacing: 0.04em;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .nav-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 24px var(--glow); }
+  .hamburger {
+    display: none; flex-direction: column; gap: 5px;
+    cursor: pointer; padding: 4px;
+  }
+  .hamburger span {
+    display: block; width: 24px; height: 2px;
+    background: var(--text); border-radius: 2px;
+    transition: transform 0.3s, opacity 0.3s;
+  }
+  .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .hamburger.open span:nth-child(2) { opacity: 0; }
+  .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+  .mobile-menu {
+    display: none; position: fixed;
+    top: 72px; left: 0; right: 0;
+    background: rgba(8,11,16,0.97);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 1.5rem 2rem 2rem;
+    flex-direction: column; gap: 1.5rem;
+    z-index: 999;
+    transform: translateY(-20px); opacity: 0;
+    transition: transform 0.3s, opacity 0.3s;
+  }
+  .mobile-menu.open { display: flex; transform: translateY(0); opacity: 1; }
+  .mobile-menu a {
+    color: var(--text2); text-decoration: none;
+    font-size: 1.1rem; font-weight: 500;
+    transition: color 0.2s;
+  }
+  .mobile-menu a:hover { color: var(--accent); }
+
+  /* ── HERO ── */
+  #hero {
+    min-height: 100vh;
+    display: flex; align-items: center;
+    position: relative; overflow: hidden;
+    padding: 120px clamp(1rem,5vw,6rem) 80px;
+  }
+  .hero-bg {
+    position: absolute; inset: 0; z-index: 0;
+    background:
+      radial-gradient(ellipse 70% 60% at 80% 50%, rgba(57,255,143,0.07) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 80% at 20% 80%, rgba(232,245,60,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 40% at 60% 20%, rgba(255,77,109,0.05) 0%, transparent 60%);
+  }
+  .hero-grid {
+    position: absolute; inset: 0; z-index: 0; opacity: 0.04;
+    background-image:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+  .hero-content {
+    position: relative; z-index: 2;
+    max-width: 680px;
+  }
+  .hero-tag {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 50px; padding: 6px 16px;
+    font-size: 0.8rem; font-weight: 600; letter-spacing: 0.08em;
+    color: var(--accent2); text-transform: uppercase;
+    margin-bottom: 2rem;
+  }
+  .hero-tag::before {
+    content: ''; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--accent2);
+    animation: blink 1.5s ease-in-out infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3.5rem, 9vw, 8rem);
+    line-height: 0.95; letter-spacing: 0.02em;
+    color: var(--text);
+    margin-bottom: 1.5rem;
+  }
+  .hero-title .highlight { color: var(--accent); }
+  .hero-title .outline {
+    -webkit-text-stroke: 1px var(--text2);
+    color: transparent;
+  }
+  .hero-sub {
+    font-size: clamp(1rem, 2.5vw, 1.2rem);
+    color: var(--text2); max-width: 520px;
+    margin-bottom: 2.5rem; font-weight: 300;
+    line-height: 1.7;
+  }
+  .hero-btns { display: flex; gap: 1rem; flex-wrap: wrap; }
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--accent); color: var(--bg);
+    padding: 0.9rem 2rem; border-radius: 50px;
+    font-size: 0.95rem; font-weight: 700; letter-spacing: 0.04em;
+    text-decoration: none; border: none; cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 12px 32px var(--glow); }
+  .btn-secondary {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: transparent; color: var(--text);
+    padding: 0.9rem 2rem; border-radius: 50px;
+    font-size: 0.95rem; font-weight: 600; letter-spacing: 0.04em;
+    text-decoration: none; border: 1px solid var(--border); cursor: pointer;
+    transition: border-color 0.2s, background 0.2s, transform 0.2s;
+  }
+  .btn-secondary:hover { border-color: var(--accent); background: var(--surface); transform: translateY(-3px); }
+  .hero-visual {
+    position: absolute; right: clamp(-2rem, 5vw, 4rem);
+    top: 50%; transform: translateY(-50%);
+    width: clamp(280px, 40vw, 520px);
+    height: clamp(280px, 40vw, 520px);
+    z-index: 1;
+  }
+  .hero-ring {
+    position: absolute; inset: 0; border-radius: 50%;
+    border: 1px solid var(--border);
+    animation: spinSlow 20s linear infinite;
+  }
+  .hero-ring:nth-child(1) { animation-duration: 20s; }
+  .hero-ring:nth-child(2) {
+    inset: 15%; border-style: dashed;
+    animation-direction: reverse; animation-duration: 15s;
+    border-color: rgba(232,245,60,0.15);
+  }
+  .hero-ring:nth-child(3) {
+    inset: 30%; animation-duration: 10s;
+    border-color: rgba(57,255,143,0.2);
+  }
+  @keyframes spinSlow { to { transform: rotate(360deg); } }
+  .hero-center {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    width: 120px; height: 120px;
+    background: radial-gradient(circle, rgba(232,245,60,0.2) 0%, transparent 70%);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .hero-icon-svg {
+    width: 64px; height: 64px; fill: var(--accent);
+    filter: drop-shadow(0 0 20px var(--accent));
+    animation: float 3s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)}
+  }
+  .hero-dot {
+    position: absolute; width: 8px; height: 8px;
+    border-radius: 50%; background: var(--accent2);
+    box-shadow: 0 0 12px var(--accent2);
+  }
+  .hero-dot:nth-child(5) { top: 15%; left: 50%; }
+  .hero-dot:nth-child(6) { top: 70%; left: 10%; background: var(--accent); box-shadow: 0 0 12px var(--accent); }
+  .hero-dot:nth-child(7) { top: 30%; right: 8%; background: var(--accent3); box-shadow: 0 0 12px var(--accent3); }
+  .hero-stats {
+    display: flex; gap: 2rem; margin-top: 3rem; flex-wrap: wrap;
+  }
+  .hero-stat { display: flex; flex-direction: column; }
+  .hero-stat-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem; color: var(--accent); line-height: 1;
+  }
+  .hero-stat-label { font-size: 0.8rem; color: var(--text3); letter-spacing: 0.05em; margin-top: 4px; }
+
+  /* ── SECTION COMMONS ── */
+  section { padding: clamp(5rem,10vw,8rem) clamp(1rem,5vw,6rem); }
+  .section-tag {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 1rem;
+  }
+  .section-tag::before { content: '//'; color: var(--text3); }
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    line-height: 1; letter-spacing: 0.03em; margin-bottom: 1rem;
+  }
+  .section-sub {
+    color: var(--text2); font-size: 1.05rem;
+    max-width: 540px; font-weight: 300; line-height: 1.7;
+  }
+  .section-header { margin-bottom: clamp(3rem,6vw,5rem); }
+
+  /* ── REVEAL ANIMATION ── */
+  .reveal {
+    opacity: 0; transform: translateY(40px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+  .reveal-delay-4 { transition-delay: 0.4s; }
+
+  /* ── FEATURES ── */
+  #features { background: var(--bg2); }
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem;
+  }
+  .feature-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    position: relative; overflow: hidden;
+    transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+    cursor: default;
+  }
+  .feature-card::before {
+    content: ''; position: absolute;
+    top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--card-accent, var(--accent)), transparent);
+    opacity: 0; transition: opacity 0.3s;
+  }
+  .feature-card:hover { transform: translateY(-6px); border-color: rgba(255,255,255,0.15); }
+  .feature-card:hover { box-shadow: 0 20px 60px rgba(0,0,0,0.4); }
+  .feature-card:hover::before { opacity: 1; }
+  .feature-icon {
+    width: 52px; height: 52px; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 1.5rem;
+    font-size: 1.4rem;
+    background: var(--icon-bg, rgba(232,245,60,0.1));
+  }
+  .feature-card h3 { font-size: 1.15rem; font-weight: 600; margin-bottom: 0.6rem; }
+  .feature-card p { color: var(--text2); font-size: 0.9rem; line-height: 1.65; }
+  .feature-card .feature-tag {
+    display: inline-block; margin-top: 1.2rem;
+    font-size: 0.75rem; font-weight: 600; letter-spacing: 0.06em;
+    color: var(--card-accent, var(--accent));
+    font-family: 'Space Mono', monospace;
+  }
+
+  /* ── WORKOUT PLANS ── */
+  #plans { background: var(--bg); }
+  .plans-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem; align-items: start;
+  }
+  .plan-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 2.5rem 2rem;
+    position: relative; overflow: hidden;
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  .plan-card.featured {
+    border-color: var(--accent);
+    background: linear-gradient(135deg, rgba(232,245,60,0.06) 0%, var(--surface) 100%);
+    transform: scale(1.03);
+  }
+  .plan-card:hover { transform: translateY(-6px); box-shadow: 0 20px 60px rgba(0,0,0,0.4); }
+  .plan-card.featured:hover { transform: scale(1.03) translateY(-6px); }
+  .plan-badge {
+    display: inline-block; background: var(--accent);
+    color: var(--bg); font-size: 0.7rem; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 4px 12px; border-radius: 50px;
+    margin-bottom: 1.5rem;
+  }
+  .plan-level {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem; letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+  }
+  .plan-desc { color: var(--text2); font-size: 0.9rem; margin-bottom: 2rem; }
+  .plan-features { list-style: none; margin-bottom: 2rem; }
+  .plan-features li {
+    display: flex; align-items: center; gap: 10px;
+    padding: 0.55rem 0; border-bottom: 1px solid var(--border);
+    font-size: 0.9rem; color: var(--text2);
+  }
+  .plan-features li:last-child { border-bottom: none; }
+  .plan-features li::before {
+    content: '✓'; color: var(--accent2);
+    font-weight: 700; font-size: 0.8rem; flex-shrink: 0;
+  }
+  .plan-btn {
+    display: block; text-align: center; width: 100%;
+    padding: 0.85rem; border-radius: 50px;
+    font-size: 0.9rem; font-weight: 700; letter-spacing: 0.04em;
+    text-decoration: none; border: none; cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .plan-btn-solid { background: var(--accent); color: var(--bg); }
+  .plan-btn-solid:hover { transform: translateY(-2px); box-shadow: 0 8px 24px var(--glow); }
+  .plan-btn-outline {
+    background: transparent; color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .plan-btn-outline:hover { border-color: var(--accent); background: var(--surface); transform: translateY(-2px); }
+  .plan-sessions {
+    display: flex; align-items: baseline; gap: 6px;
+    margin-bottom: 0.3rem;
+  }
+  .plan-sessions-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3rem; color: var(--accent); line-height: 1;
+  }
+  .plan-sessions-unit { color: var(--text3); font-size: 0.85rem; }
+
+  /* ── BMI CALCULATOR ── */
+  #bmi { background: var(--bg2); }
+  .bmi-wrapper {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 3rem; align-items: start;
+  }
+  .bmi-form-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 2.5rem;
+  }
+  .bmi-form-card h3 { font-size: 1.3rem; font-weight: 600; margin-bottom: 0.4rem; }
+  .bmi-form-card p { color: var(--text2); font-size: 0.9rem; margin-bottom: 2rem; }
+  .input-group { margin-bottom: 1.5rem; }
+  .input-group label {
+    display: block; font-size: 0.8rem; font-weight: 600;
+    letter-spacing: 0.06em; color: var(--text2);
+    text-transform: uppercase; margin-bottom: 0.5rem;
+  }
+  .input-row { display: flex; gap: 0.75rem; }
+  .input-field {
+    flex: 1; background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px; padding: 0.85rem 1rem;
+    color: var(--text); font-size: 1rem; font-family: 'DM Sans', sans-serif;
+    outline: none; transition: border-color 0.25s, box-shadow 0.25s;
+    width: 100%;
+  }
+  .input-field:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--glow); }
+  .input-field::placeholder { color: var(--text3); }
+  .unit-toggle {
+    display: flex; background: var(--bg);
+    border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
+    margin-bottom: 1.5rem;
+  }
+  .unit-btn {
+    flex: 1; padding: 0.7rem; border: none; background: transparent;
+    color: var(--text2); font-size: 0.85rem; font-weight: 600;
+    cursor: pointer; transition: background 0.2s, color 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .unit-btn.active { background: var(--accent); color: var(--bg); }
+  .calc-btn {
+    width: 100%; padding: 0.9rem; border-radius: 10px;
+    background: var(--accent); color: var(--bg); border: none;
+    font-size: 1rem; font-weight: 700; cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .calc-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px var(--glow); }
+  .bmi-result-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 2.5rem;
+    position: relative; overflow: hidden;
+  }
+  .bmi-result-card h3 { font-size: 1.3rem; font-weight: 600; margin-bottom: 1.5rem; }
+  .bmi-display {
+    text-align: center; padding: 2rem 0;
+  }
+  .bmi-number {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 6rem; line-height: 1;
+    color: var(--accent);
+    transition: color 0.4s;
+  }
+  .bmi-label {
+    font-size: 1.1rem; font-weight: 600; margin-top: 0.5rem;
+    transition: color 0.4s;
+  }
+  .bmi-desc { color: var(--text2); font-size: 0.85rem; margin-top: 0.5rem; }
+  .bmi-scale {
+    margin-top: 2rem;
+  }
+  .bmi-scale-bar {
+    height: 8px; border-radius: 4px; margin-bottom: 0.5rem;
+    background: linear-gradient(90deg, #39ff8f 0%, #e8f53c 35%, #ff9800 65%, #ff4d6d 100%);
+    position: relative;
+  }
+  .bmi-pointer {
+    position: absolute; top: -4px; width: 16px; height: 16px;
+    border-radius: 50%; background: var(--text);
+    border: 2px solid var(--bg); transform: translateX(-50%);
+    transition: left 0.5s cubic-bezier(0.34,1.56,0.64,1);
+    left: 50%;
+  }
+  .bmi-scale-labels {
+    display: flex; justify-content: space-between;
+    font-size: 0.7rem; color: var(--text3);
+    font-family: 'Space Mono', monospace;
+  }
+  .bmi-ranges {
+    margin-top: 1.5rem; display: flex; flex-direction: column; gap: 8px;
+  }
+  .bmi-range {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 12px; border-radius: 8px; background: var(--bg);
+    font-size: 0.82rem;
+  }
+  .bmi-range-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .bmi-range-label { color: var(--text2); flex: 1; }
+  .bmi-range-val { font-family: 'Space Mono', monospace; color: var(--text3); font-size: 0.78rem; }
+
+  /* ── TESTIMONIALS ── */
+  #testimonials { background: var(--bg); overflow: hidden; }
+  .testimonials-track-wrap { overflow: hidden; margin: 0 -2rem; padding: 1rem 0; }
+  .testimonials-track {
+    display: flex; gap: 1.5rem;
+    animation: scrollTrack 30s linear infinite;
+    width: max-content;
+  }
+  .testimonials-track:hover { animation-play-state: paused; }
+  @keyframes scrollTrack {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  .testi-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 2rem; min-width: 300px; max-width: 320px;
+    flex-shrink: 0;
+  }
+  .testi-stars { color: var(--accent); font-size: 0.9rem; margin-bottom: 1rem; letter-spacing: 3px; }
+  .testi-text { color: var(--text2); font-size: 0.9rem; line-height: 1.65; margin-bottom: 1.5rem; font-style: italic; }
+  .testi-author { display: flex; align-items: center; gap: 12px; }
+  .testi-avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 0.85rem;
+    flex-shrink: 0;
+  }
+  .testi-name { font-weight: 600; font-size: 0.9rem; }
+  .testi-role { color: var(--text3); font-size: 0.78rem; }
+
+  /* ── STATS ── */
+  #stats { background: var(--bg2); }
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+  }
+  .stat-card {
+    text-align: center; padding: 2.5rem 1.5rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    position: relative; overflow: hidden;
+  }
+  .stat-card::after {
+    content: ''; position: absolute;
+    bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 60%; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  }
+  .stat-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3.5rem; color: var(--accent); line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+  .stat-label { color: var(--text2); font-size: 0.9rem; }
+  .stat-icon { font-size: 2rem; margin-bottom: 1rem; }
+
+  /* ── FAQ ── */
+  #faq { background: var(--bg); }
+  .faq-list { max-width: 760px; margin: 0 auto; }
+  .faq-item {
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .faq-question {
+    width: 100%; display: flex; justify-content: space-between; align-items: center;
+    padding: 1.5rem 0; background: none; border: none; cursor: pointer;
+    text-align: left; color: var(--text); font-family: 'DM Sans', sans-serif;
+    font-size: 1rem; font-weight: 500; gap: 1rem;
+    transition: color 0.2s;
+  }
+  .faq-question:hover { color: var(--accent); }
+  .faq-icon {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--surface); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; font-size: 1rem; color: var(--accent);
+    transition: transform 0.3s, background 0.3s;
+  }
+  .faq-item.open .faq-icon { transform: rotate(45deg); background: var(--accent); color: var(--bg); }
+  .faq-answer {
+    max-height: 0; overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.4,0,0.2,1), padding 0.3s;
+  }
+  .faq-answer p {
+    color: var(--text2); font-size: 0.95rem; line-height: 1.7;
+    padding-bottom: 1.5rem;
+  }
+  .faq-item.open .faq-answer { max-height: 300px; }
+
+  /* ── CONTACT ── */
+  #contact { background: var(--bg2); }
+  .contact-grid {
+    display: grid; grid-template-columns: 1fr 1.4fr;
+    gap: 4rem; align-items: start;
+  }
+  .contact-info h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.5rem; letter-spacing: 0.03em;
+    margin-bottom: 1rem;
+  }
+  .contact-info p { color: var(--text2); font-size: 0.95rem; line-height: 1.7; margin-bottom: 2rem; }
+  .contact-links { display: flex; flex-direction: column; gap: 1rem; }
+  .contact-link {
+    display: flex; align-items: center; gap: 12px;
+    color: var(--text2); font-size: 0.9rem; text-decoration: none;
+    transition: color 0.2s;
+  }
+  .contact-link:hover { color: var(--accent); }
+  .contact-link-icon {
+    width: 40px; height: 40px; border-radius: 10px;
+    background: var(--surface); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem; flex-shrink: 0;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .contact-link:hover .contact-link-icon { background: var(--accent); border-color: var(--accent); }
+  .contact-form-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 2.5rem;
+  }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .form-group { margin-bottom: 1.25rem; }
+  .form-group label {
+    display: block; font-size: 0.8rem; font-weight: 600;
+    letter-spacing: 0.05em; color: var(--text2);
+    text-transform: uppercase; margin-bottom: 0.5rem;
+  }
+  .form-textarea {
+    resize: vertical; min-height: 120px;
+    line-height: 1.6;
+  }
+  .form-success {
+    display: none; text-align: center; padding: 2rem;
+    color: var(--accent2);
+  }
+  .form-success .success-icon { font-size: 3rem; margin-bottom: 1rem; }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--bg);
+    border-top: 1px solid var(--border);
+    padding: clamp(3rem,6vw,5rem) clamp(1rem,5vw,6rem) 2rem;
+  }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 1.5fr repeat(3,1fr);
+    gap: 3rem; margin-bottom: 3rem;
+  }
+  .footer-brand p { color: var(--text2); font-size: 0.9rem; margin-top: 1rem; line-height: 1.65; max-width: 280px; }
+  .footer-social { display: flex; gap: 0.75rem; margin-top: 1.5rem; flex-wrap: wrap; }
+  .social-btn {
+    width: 36px; height: 36px; border-radius: 8px;
+    background: var(--surface); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.9rem; text-decoration: none; color: var(--text2);
+    transition: background 0.2s, color 0.2s, transform 0.2s;
+  }
+  .social-btn:hover { background: var(--accent); color: var(--bg); transform: translateY(-2px); }
+  .footer-col h4 {
+    font-size: 0.8rem; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--text3);
+    margin-bottom: 1.25rem;
+  }
+  .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 0.75rem; }
+  .footer-col a {
+    color: var(--text2); text-decoration: none; font-size: 0.9rem;
+    transition: color 0.2s;
+  }
+  .footer-col a:hover { color: var(--accent); }
+  .footer-bottom {
+    border-top: 1px solid var(--border);
+    padding-top: 2rem;
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 1rem;
+  }
+  .footer-copy { color: var(--text3); font-size: 0.85rem; }
+  .footer-legal { display: flex; gap: 1.5rem; }
+  .footer-legal a { color: var(--text3); font-size: 0.85rem; text-decoration: none; transition: color 0.2s; }
+  .footer-legal a:hover { color: var(--accent); }
+
+  /* ── SCROLL TO TOP ── */
+  #scrollTop {
+    position: fixed; bottom: 2rem; right: 2rem; z-index: 900;
+    width: 48px; height: 48px; border-radius: 12px;
+    background: var(--accent); color: var(--bg);
+    border: none; cursor: pointer; font-size: 1.1rem;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 8px 24px var(--glow);
+    transform: translateY(80px); opacity: 0;
+    transition: transform 0.35s, opacity 0.35s;
+  }
+  #scrollTop.visible { transform: translateY(0); opacity: 1; }
+  #scrollTop:hover { transform: translateY(-4px); box-shadow: 0 12px 32px var(--glow); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 1024px) {
+    .bmi-wrapper { grid-template-columns: 1fr; }
+    .contact-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+    .hero-visual { opacity: 0.3; }
+  }
+  @media (max-width: 768px) {
+    .nav-links, .nav-cta { display: none; }
+    .hamburger { display: flex; }
+    .hero-visual { display: none; }
+    .form-row { grid-template-columns: 1fr; }
+    .footer-grid { grid-template-columns: 1fr; gap: 2rem; }
+    .footer-bottom { flex-direction: column; text-align: center; }
+    .plans-grid { grid-template-columns: 1fr; }
+    .plan-card.featured { transform: none; }
+    .plan-card.featured:hover { transform: translateY(-6px); }
+  }
+</style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="loader-logo">APEX</div>
+  <div class="loader-bar-wrap"><div class="loader-bar"></div></div>
+</div>
+
+<!-- NAV -->
+<nav id="navbar">
+  <a href="#hero" class="nav-logo">APEX<span>FIT</span></a>
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#plans">Plans</a></li>
+    <li><a href="#bmi">BMI</a></li>
+    <li><a href="#testimonials">Reviews</a></li>
+    <li><a href="#faq">FAQ</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a href="#plans" class="nav-cta">Get Started</a>
+  <div class="hamburger" id="hamburger">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#features" class="mobile-link">Features</a>
+  <a href="#plans" class="mobile-link">Workout Plans</a>
+  <a href="#bmi" class="mobile-link">BMI Calculator</a>
+  <a href="#testimonials" class="mobile-link">Testimonials</a>
+  <a href="#faq" class="mobile-link">FAQ</a>
+  <a href="#contact" class="mobile-link">Contact</a>
+</div>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <div class="hero-tag">New Season. New Goals.</div>
+    <h1 class="hero-title">
+      TRAIN<br>
+      <span class="highlight">HARDER.</span><br>
+      <span class="outline">RECOVER</span><br>
+      SMARTER.
+    </h1>
+    <p class="hero-sub">Your all-in-one performance platform. Track workouts, count calories, and crush your goals with AI-driven insights.</p>
+    <div class="hero-btns">
+      <a href="#plans" class="btn-primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        Start Free Trial
+      </a>
+      <a href="#features" class="btn-secondary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+        Watch Demo
+      </a>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <span class="hero-stat-num">2M+</span>
+        <span class="hero-stat-label">Active Users</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-num">98%</span>
+        <span class="hero-stat-label">Satisfaction</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-num">500+</span>
+        <span class="hero-stat-label">Workout Plans</span>
+      </div>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="hero-ring"></div>
+    <div class="hero-ring"></div>
+    <div class="hero-ring"></div>
+    <div class="hero-center">
+      <svg class="hero-icon-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M20.57 14.86L22 13.43 20.57 12 17 15.57 8.43 7 12 3.43 10.57 2 9.14 3.43 7.71 2 5.57 4.14 4.14 2.71 2.71 4.14l1.43 1.43L2 7.71l1.43 1.43L2 10.57 3.43 12 7 8.43 15.57 17 12 20.57 13.43 22l1.43-1.43L16.29 22l2.14-2.14 1.43 1.43 1.43-1.43-1.43-1.43L22 16.29z"/>
+      </svg>
+    </div>
+    <div class="hero-dot"></div>
+    <div class="hero-dot"></div>
+    <div class="hero-dot"></div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="section-header reveal">
+    <div class="section-tag">What We Offer</div>
+    <h2 class="section-title">BUILT FOR <span style="color:var(--accent)">CHAMPIONS</span></h2>
+    <p class="section-sub">Every tool you need to reach peak performance — all in one powerful platform.</p>
+  </div>
+  <div class="features-grid">
+    <div class="feature-card reveal reveal-delay-1" style="--card-accent: #e8f53c; --icon-bg: rgba(232,245,60,0.1);">
+      <div class="feature-icon">⚡</div>
+      <h3>Workout Tracking</h3>
+      <p>Log every set, rep, and rest time. Visualize your performance with detailed charts and weekly summaries.</p>
+      <span class="feature-tag">→ EXPLORE</span>
+    </div>
+    <div class="feature-card reveal reveal-delay-2" style="--card-accent: #39ff8f; --icon-bg: rgba(57,255,143,0.1);">
+      <div class="feature-icon">🔥</div>
+      <h3>Calorie Counter</h3>
+      <p>Scan barcodes, search 5M+ foods, and auto-calculate your macros. Stay in a perfect deficit or surplus.</p>
+      <span class="feature-tag" style="color:#39ff8f">→ EXPLORE</span>
+    </div>
+    <div class="feature-card reveal reveal-delay-3" style="--card-accent: #7c6fff; --icon-bg: rgba(124,111,255,0.1);">
+      <div class="feature-icon">📈</div>
+      <h3>Progress Analytics</h3>
+      <p>AI-powered trend analysis across weight, strength, and endurance. Know exactly when to push harder.</p>
+      <span class="feature-tag" style="color:#7c6fff">→ EXPLORE</span>
+    </div>
+    <div class="feature-card reveal reveal-delay-4" style="--card-accent: #ff4d6d; --icon-bg: rgba(255,77,109,0.1);">
+      <div class="feature-icon">🎯</div>
+      <h3>Personal Trainer AI</h3>
+      <p>Get real-time form correction, adaptive programming, and personalized recovery advice from your AI coach.</p>
+      <span class="feature-tag" style="color:#ff4d6d">→ EXPLORE</span>
+    </div>
+    <div class="feature-card reveal reveal-delay-1" style="--card-accent: #00d4ff; --icon-bg: rgba(0,212,255,0.1);">
+      <div class="feature-icon">💤</div>
+      <h3>Recovery Optimizer</h3>
+      <p>Sleep tracking, HRV monitoring, and smart rest day scheduling to keep you performing at 100% every day.</p>
+      <span class="feature-tag" style="color:#00d4ff">→ EXPLORE</span>
+    </div>
+    <div class="feature-card reveal reveal-delay-2" style="--card-accent: #ff9800; --icon-bg: rgba(255,152,0,0.1);">
+      <div class="feature-icon">🏆</div>
+      <h3>Challenges & Streaks</h3>
+      <p>Stay motivated with community challenges, daily streaks, and milestone rewards that celebrate every win.</p>
+      <span class="feature-tag" style="color:#ff9800">→ EXPLORE</span>
+    </div>
+  </div>
+</section>
+
+<!-- PLANS -->
+<section id="plans">
+  <div class="section-header reveal">
+    <div class="section-tag">Workout Plans</div>
+    <h2 class="section-title">CHOOSE YOUR <span style="color:var(--accent)">LEVEL</span></h2>
+    <p class="section-sub">Structured programs designed by certified coaches. Progress at your own pace.</p>
+  </div>
+  <div class="plans-grid">
+    <div class="plan-card reveal reveal-delay-1">
+      <div class="plan-sessions"><span class="plan-sessions-num">3</span><span class="plan-sessions-unit">sessions/week</span></div>
+      <div class="plan-level">BEGINNER</div>
+      <p class="plan-desc">Build a solid foundation with bodyweight and light resistance exercises.</p>
+      <ul class="plan-features">
+        <li>Full-body compound movements</li>
+        <li>Technique & form tutorials</li>
+        <li>12-week progressive plan</li>
+        <li>Nutrition starter guide</li>
+        <li>Basic progress tracking</li>
+      </ul>
+      <button class="plan-btn plan-btn-outline">Start Beginner →</button>
+    </div>
+    <div class="plan-card featured reveal reveal-delay-2">
+      <div class="plan-badge">MOST POPULAR</div>
+      <div class="plan-sessions"><span class="plan-sessions-num">5</span><span class="plan-sessions-unit">sessions/week</span></div>
+      <div class="plan-level">INTERMEDIATE</div>
+      <p class="plan-desc">Push through plateaus with periodized split training and advanced techniques.</p>
+      <ul class="plan-features">
+        <li>PPL & Upper/Lower splits</li>
+        <li>Progressive overload system</li>
+        <li>20-week periodized program</li>
+        <li>Macro tracking & meal plans</li>
+        <li>AI coach feedback</li>
+        <li>Community access</li>
+      </ul>
+      <button class="plan-btn plan-btn-solid">Start Intermediate →</button>
+    </div>
+    <div class="plan-card reveal reveal-delay-3">
+      <div class="plan-sessions"><span class="plan-sessions-num" style="color:var(--accent3)">6</span><span class="plan-sessions-unit">sessions/week</span></div>
+      <div class="plan-level">ADVANCED</div>
+      <p class="plan-desc">Elite-level programming for athletes chasing peak competition performance.</p>
+      <ul class="plan-features">
+        <li>Conjugate & block periodization</li>
+        <li>Sport-specific conditioning</li>
+        <li>Unlimited program access</li>
+        <li>1-on-1 coach sessions</li>
+        <li>Full biometric analytics</li>
+        <li>Priority support</li>
+      </ul>
+      <button class="plan-btn plan-btn-outline" style="border-color: var(--accent3); color: var(--accent3);">Start Advanced →</button>
+    </div>
+  </div>
+</section>
+
+<!-- BMI CALCULATOR -->
+<section id="bmi">
+  <div class="section-header reveal">
+    <div class="section-tag">Health Tools</div>
+    <h2 class="section-title">BMI <span style="color:var(--accent)">CALCULATOR</span></h2>
+    <p class="section-sub">Calculate your Body Mass Index and understand where you stand on the health spectrum.</p>
+  </div>
+  <div class="bmi-wrapper">
+    <div class="bmi-form-card reveal">
+      <h3>Enter Your Details</h3>
+      <p>Fill in your measurements to calculate your BMI instantly.</p>
+      <div class="unit-toggle">
+        <button class="unit-btn active" id="unitMetric">Metric (cm/kg)</button>
+        <button class="unit-btn" id="unitImperial">Imperial (ft·in/lbs)</button>
+      </div>
+      <div class="input-group" id="heightGroup">
+        <label>Height</label>
+        <div class="input-row">
+          <input type="number" class="input-field" id="heightInput" placeholder="Height (cm)" min="50" max="300">
+        </div>
+      </div>
+      <div class="input-group" id="heightGroupImperial" style="display:none">
+        <label>Height</label>
+        <div class="input-row">
+          <input type="number" class="input-field" id="heightFt" placeholder="Feet" min="1" max="9">
+          <input type="number" class="input-field" id="heightIn" placeholder="Inches" min="0" max="11">
+        </div>
+      </div>
+      <div class="input-group">
+        <label id="weightLabel">Weight (kg)</label>
+        <input type="number" class="input-field" id="weightInput" placeholder="Enter your weight" min="1" max="500">
+      </div>
+      <button class="calc-btn" id="calcBmi">Calculate BMI</button>
+    </div>
+    <div class="bmi-result-card reveal reveal-delay-2">
+      <h3>Your Result</h3>
+      <div class="bmi-display">
+        <div class="bmi-number" id="bmiNumber">—</div>
+        <div class="bmi-label" id="bmiLabel" style="color:var(--text2)">Enter values to calculate</div>
+        <div class="bmi-desc" id="bmiDesc"></div>
+      </div>
+      <div class="bmi-scale">
+        <div class="bmi-scale-bar"><div class="bmi-pointer" id="bmiPointer"></div></div>
+        <div class="bmi-scale-labels">
+          <span>16</span><span>18.5</span><span>25</span><span>30</span><span>40</span>
+        </div>
+      </div>
+      <div class="bmi-ranges">
+        <div class="bmi-range"><div class="bmi-range-dot" style="background:#39ff8f"></div><span class="bmi-range-label">Underweight</span><span class="bmi-range-val">< 18.5</span></div>
+        <div class="bmi-range"><div class="bmi-range-dot" style="background:#e8f53c"></div><span class="bmi-range-label">Normal weight</span><span class="bmi-range-val">18.5 – 24.9</span></div>
+        <div class="bmi-range"><div class="bmi-range-dot" style="background:#ff9800"></div><span class="bmi-range-label">Overweight</span><span class="bmi-range-val">25 – 29.9</span></div>
+        <div class="bmi-range"><div class="bmi-range-dot" style="background:#ff4d6d"></div><span class="bmi-range-label">Obese</span><span class="bmi-range-val">≥ 30</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="testimonials">
+  <div class="section-header reveal" style="text-align:center; max-width:600px; margin:0 auto clamp(3rem,6vw,5rem);">
+    <div class="section-tag">Real Results</div>
+    <h2 class="section-title">WHAT ATHLETES <span style="color:var(--accent)">SAY</span></h2>
+  </div>
+  <div class="testimonials-track-wrap">
+    <div class="testimonials-track" id="testiTrack">
+      <!-- JS duplicates these -->
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">"Lost 18kg in 4 months and built real strength. The AI coach adjusted my program every week — felt like having a professional trainer in my pocket."</p>
+        <div class="testi-author">
+          <div class="testi-avatar" style="background:linear-gradient(135deg,#e8f53c,#39ff8f);color:#080b10">JK</div>
+          <div><div class="testi-name">James K.</div><div class="testi-role">Lost 18kg • 4 months</div></div>
+        </div>
+      </div>
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">"The calorie tracking is so seamless. I finally hit my macros consistently and my energy levels are through the roof. Best fitness app, period."</p>
+        <div class="testi-author">
+          <div class="testi-avatar" style="background:linear-gradient(135deg,#7c6fff,#ff4d6d);color:#fff">SM</div>
+          <div><div class="testi-name">Sara M.</div><div class="testi-role">Marathon runner</div></div>
+        </div>
+      </div>
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">"Advanced plan transformed my powerlifting. My squat went from 120kg to 180kg in 6 months. The periodization programming is elite level."</p>
+        <div class="testi-author">
+          <div class="testi-avatar" style="background:linear-gradient(135deg,#ff9800,#ff4d6d);color:#fff">DT</div>
+          <div><div class="testi-name">David T.</div><div class="testi-role">+60kg squat PR</div></div>
+        </div>
+      </div>
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">"As a complete beginner I was intimidated, but the beginner plan and video tutorials made everything click. I'm now on the intermediate plan!"</p>
+        <div class="testi-author">
+          <div class="testi-avatar" style="background:linear-gradient(135deg,#00d4ff,#7c6fff);color:#fff">AP</div>
+          <div><div class="testi-name">Amy P.</div><div class="testi-role">Beginner → Intermediate</div></div>
+        </div>
+      </div>
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">"The recovery tracking changed everything for me. I used to overtrain constantly. Now I know exactly when to rest and my progress has actually accelerated."</p>
+        <div class="testi-author">
+          <div class="testi-avatar" style="background:linear-gradient(135deg,#39ff8f,#00d4ff);color:#080b10">RC</div>
+          <div><div class="testi-name">Ryan C.</div><div class="testi-role">Cyclist & Triathlete</div></div>
+        </div>
+      </div>
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">"The analytics dashboard is insane. I can see my progressive overload trends, recovery scores, and PR history all in one place. Data nerd's dream."</p>
+        <div class="testi-author">
+          <div class="testi-avatar" style="background:linear-gradient(135deg,#e8f53c,#ff9800);color:#080b10">ML</div>
+          <div><div class="testi-name">Marcus L.</div><div class="testi-role">Strength athlete</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section id="stats">
+  <div class="section-header reveal" style="text-align:center;">
+    <div class="section-tag">By The Numbers</div>
+    <h2 class="section-title">OUR <span style="color:var(--accent)">IMPACT</span></h2>
+  </div>
+  <div class="stats-grid">
+    <div class="stat-card reveal reveal-delay-1">
+      <div class="stat-icon">👥</div>
+      <div class="stat-num" data-target="2000000" data-suffix="M+">0</div>
+      <div class="stat-label">Active Members</div>
+    </div>
+    <div class="stat-card reveal reveal-delay-2">
+      <div class="stat-icon">💪</div>
+      <div class="stat-num" data-target="500" data-suffix="+">0</div>
+      <div class="stat-label">Workout Programs</div>
+    </div>
+    <div class="stat-card reveal reveal-delay-3">
+      <div class="stat-icon">🔥</div>
+      <div class="stat-num" data-target="98" data-suffix="%">0</div>
+      <div class="stat-label">Satisfaction Rate</div>
+    </div>
+    <div class="stat-card reveal reveal-delay-4">
+      <div class="stat-icon">🌍</div>
+      <div class="stat-num" data-target="150" data-suffix="+">0</div>
+      <div class="stat-label">Countries Reached</div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq">
+  <div class="section-header reveal" style="text-align:center; max-width:600px; margin:0 auto clamp(3rem,6vw,5rem);">
+    <div class="section-tag">FAQ</div>
+    <h2 class="section-title">GOT <span style="color:var(--accent)">QUESTIONS?</span></h2>
+    <p class="section-sub" style="margin:0 auto">Everything you need to know about APEX FITNESS.</p>
+  </div>
+  <div class="faq-list reveal">
+    <div class="faq-item">
+      <button class="faq-question">
+        How is APEX different from other fitness apps?
+        <span class="faq-icon">+</span>
+      </button>
+      <div class="faq-answer"><p>APEX combines AI-driven adaptive programming, real-time form analysis, comprehensive nutrition tracking, and recovery optimization in a single platform. Unlike generic apps, your program evolves with you every single week based on your performance data and biometrics.</p></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question">
+        Do I need gym equipment to get started?
+        <span class="faq-icon">+</span>
+      </button>
+      <div class="faq-answer"><p>Not at all! Our Beginner plan is fully bodyweight-based and can be done anywhere. We also offer home gym, resistance band, and full gym program variants so you can train effectively regardless of your setup.</p></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question">
+        How does the AI Personal Trainer work?
+        <span class="faq-icon">+</span>
+      </button>
+      <div class="faq-answer"><p>Our AI analyzes your workout logs, recovery metrics, sleep data, and performance trends to automatically adjust your programming. It detects plateaus before they happen, suggests deload weeks, and can modify exercises based on injuries or equipment limitations.</p></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question">
+        Can I switch between plans?
+        <span class="faq-icon">+</span>
+      </button>
+      <div class="faq-answer"><p>Absolutely. You can switch between Beginner, Intermediate, and Advanced plans at any time. The AI will assess your current fitness level and create a smooth transition program so you don't lose momentum or risk injury.</p></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question">
+        Is there a free trial?
+        <span class="faq-icon">+</span>
+      </button>
+      <div class="faq-answer"><p>Yes! Every new member gets a full 14-day free trial with access to all features — no credit card required. After the trial, you can choose the plan that fits your goals and budget. We also offer a 30-day money-back guarantee.</p></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question">
+        What devices does APEX support?
+        <span class="faq-icon">+</span>
+      </button>
+      <div class="faq-answer"><p>APEX is available on iOS, Android, and as a web app that works on any browser. We sync seamlessly with Apple Health, Google Fit, Garmin, Whoop, and most popular fitness wearables.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="contact-grid">
+    <div class="contact-info reveal">
+      <div class="section-tag">Get In Touch</div>
+      <h3>LET'S TALK<br><span style="color:var(--accent)">FITNESS.</span></h3>
+      <p>Have questions? We're here for you. Reach out and our team of fitness experts will get back to you within 24 hours.</p>
+      <div class="contact-links">
+        <a href="mailto:hello@apexfit.com" class="contact-link">
+          <div class="contact-link-icon">✉</div>
+          hello@apexfit.com
+        </a>
+        <a href="tel:+18005555555" class="contact-link">
+          <div class="contact-link-icon">📞</div>
+          +1 (800) 555 APEX
+        </a>
+        <a href="#" class="contact-link">
+          <div class="contact-link-icon">📍</div>
+          100 Performance Ave, San Francisco, CA
+        </a>
+      </div>
+    </div>
+    <div class="contact-form-card reveal reveal-delay-2">
+      <div id="formContent">
+        <div class="form-row">
+          <div class="form-group">
+            <label>First Name</label>
+            <input type="text" class="input-field" placeholder="John" id="fname">
+          </div>
+          <div class="form-group">
+            <label>Last Name</label>
+            <input type="text" class="input-field" placeholder="Doe" id="lname">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" class="input-field" placeholder="john@example.com" id="femail">
+        </div>
+        <div class="form-group">
+          <label>Subject</label>
+          <input type="text" class="input-field" placeholder="How can we help?" id="fsubject">
+        </div>
+        <div class="form-group">
+          <label>Message</label>
+          <textarea class="input-field form-textarea" placeholder="Tell us more about your goals..." id="fmessage"></textarea>
+        </div>
+        <button class="calc-btn" id="submitForm">Send Message →</button>
+      </div>
+      <div class="form-success" id="formSuccess">
+        <div class="success-icon">✓</div>
+        <h3 style="font-size:1.3rem;margin-bottom:0.5rem">Message Sent!</h3>
+        <p style="color:var(--text2);font-size:0.9rem">We'll get back to you within 24 hours. In the meantime, check out our FAQ section.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a href="#hero" class="nav-logo" style="font-size:2rem">APEX<span>FIT</span></a>
+      <p>The all-in-one performance platform built for athletes who refuse to settle. Train smarter. Recover faster. Dominate.</p>
+      <div class="footer-social">
+        <a href="#" class="social-btn">𝕏</a>
+        <a href="#" class="social-btn">in</a>
+        <a href="#" class="social-btn">▶</a>
+        <a href="#" class="social-btn">f</a>
+        <a href="#" class="social-btn">◉</a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Product</h4>
+      <ul>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#plans">Workout Plans</a></li>
+        <li><a href="#bmi">BMI Calculator</a></li>
+        <li><a href="#">Mobile App</a></li>
+        <li><a href="#">API Access</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <ul>
+        <li><a href="#">About Us</a></li>
+        <li><a href="#">Careers</a></li>
+        <li><a href="#">Press Kit</a></li>
+        <li><a href="#">Blog</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Support</h4>
+      <ul>
+        <li><a href="#faq">FAQ</a></li>
+        <li><a href="#">Help Center</a></li>
+        <li><a href="#">Community</a></li>
+        <li><a href="#">Status</a></li>
+        <li><a href="#">Feedback</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy">© 2026 APEX FITNESS. All rights reserved.</div>
+    <div class="footer-legal">
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms of Service</a>
+      <a href="#">Cookie Policy</a>
+    </div>
+  </div>
+</footer>
+
+<!-- SCROLL TOP -->
+<button id="scrollTop" title="Scroll to top">↑</button>
+
+<script>
+  // ── LOADER
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      document.getElementById('loader').classList.add('hide');
+    }, 1900);
+  });
+
+  // ── NAV SCROLL
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    navbar.classList.toggle('scrolled', window.scrollY > 40);
+    document.getElementById('scrollTop').classList.toggle('visible', window.scrollY > 400);
+  }, { passive: true });
+
+  // ── HAMBURGER
+  const hamburger = document.getElementById('hamburger');
+  const mobileMenu = document.getElementById('mobileMenu');
+  hamburger.addEventListener('click', () => {
+    hamburger.classList.toggle('open');
+    mobileMenu.classList.toggle('open');
+  });
+  document.querySelectorAll('.mobile-link').forEach(link => {
+    link.addEventListener('click', () => {
+      hamburger.classList.remove('open');
+      mobileMenu.classList.remove('open');
+    });
+  });
+
+  // ── SCROLL REVEAL
+  const revealEls = document.querySelectorAll('.reveal');
+  const revealObs = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+  }, { threshold: 0.12 });
+  revealEls.forEach(el => revealObs.observe(el));
+
+  // ── SCROLL TOP
+  document.getElementById('scrollTop').addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  // ── FAQ ACCORDION
+  document.querySelectorAll('.faq-question').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item = btn.parentElement;
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+      if (!isOpen) item.classList.add('open');
+    });
+  });
+
+  // ── BMI CALCULATOR
+  let isMetric = true;
+  document.getElementById('unitMetric').addEventListener('click', () => {
+    isMetric = true;
+    document.getElementById('unitMetric').classList.add('active');
+    document.getElementById('unitImperial').classList.remove('active');
+    document.getElementById('heightGroup').style.display = 'block';
+    document.getElementById('heightGroupImperial').style.display = 'none';
+    document.getElementById('weightLabel').textContent = 'Weight (kg)';
+    document.getElementById('weightInput').placeholder = 'Enter your weight (kg)';
+  });
+  document.getElementById('unitImperial').addEventListener('click', () => {
+    isMetric = false;
+    document.getElementById('unitImperial').classList.add('active');
+    document.getElementById('unitMetric').classList.remove('active');
+    document.getElementById('heightGroup').style.display = 'none';
+    document.getElementById('heightGroupImperial').style.display = 'block';
+    document.getElementById('weightLabel').textContent = 'Weight (lbs)';
+    document.getElementById('weightInput').placeholder = 'Enter your weight (lbs)';
+  });
+
+  document.getElementById('calcBmi').addEventListener('click', () => {
+    let heightM, weightKg;
+    if (isMetric) {
+      const hcm = parseFloat(document.getElementById('heightInput').value);
+      weightKg = parseFloat(document.getElementById('weightInput').value);
+      if (!hcm || !weightKg || hcm < 50 || hcm > 300) return showBmiError();
+      heightM = hcm / 100;
+    } else {
+      const ft = parseFloat(document.getElementById('heightFt').value) || 0;
+      const ins = parseFloat(document.getElementById('heightIn').value) || 0;
+      const lbs = parseFloat(document.getElementById('weightInput').value);
+      if (!ft || !lbs) return showBmiError();
+      heightM = (ft * 12 + ins) * 0.0254;
+      weightKg = lbs * 0.453592;
+    }
+    const bmi = weightKg / (heightM * heightM);
+    displayBmi(bmi);
+  });
+
+  function showBmiError() {
+    document.getElementById('bmiNumber').textContent = '!';
+    document.getElementById('bmiLabel').textContent = 'Please fill in valid values';
+    document.getElementById('bmiLabel').style.color = 'var(--accent3)';
+    document.getElementById('bmiDesc').textContent = '';
+  }
+
+  function displayBmi(bmi) {
+    const num = document.getElementById('bmiNumber');
+    const label = document.getElementById('bmiLabel');
+    const desc = document.getElementById('bmiDesc');
+    const pointer = document.getElementById('bmiPointer');
+
+    num.textContent = bmi.toFixed(1);
+    let color, text, description;
+    if (bmi < 18.5) {
+      color = '#39ff8f'; text = 'Underweight';
+      description = 'Consider increasing caloric intake and strength training to build muscle mass.';
+    } else if (bmi < 25) {
+      color = '#e8f53c'; text = 'Normal Weight';
+      description = 'Great! Maintain your current lifestyle with balanced nutrition and regular exercise.';
+    } else if (bmi < 30) {
+      color = '#ff9800'; text = 'Overweight';
+      description = 'A moderate calorie deficit with regular cardio and strength training can help.';
+    } else {
+      color = '#ff4d6d'; text = 'Obese';
+      description = 'Consult a healthcare professional for a personalized plan to improve your health.';
+    }
+    num.style.color = color;
+    label.textContent = text;
+    label.style.color = color;
+    desc.textContent = description;
+
+    // Pointer position: range 16–40
+    const pct = Math.min(Math.max((bmi - 16) / (40 - 16), 0), 1) * 100;
+    pointer.style.left = pct + '%';
+  }
+
+  // ── STATS COUNTER
+  function animateCounter(el) {
+    const target = parseInt(el.dataset.target);
+    const suffix = el.dataset.suffix;
+    const isMillions = target >= 1000000;
+    const displayTarget = isMillions ? target / 1000000 : target;
+    const duration = 2000;
+    const start = performance.now();
+
+    function update(now) {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+      const ease = 1 - Math.pow(1 - progress, 3);
+      const current = isMillions
+        ? (ease * displayTarget).toFixed(1)
+        : Math.round(ease * displayTarget);
+      el.textContent = (isMillions ? current + suffix : current + suffix);
+      if (progress < 1) requestAnimationFrame(update);
+    }
+    requestAnimationFrame(update);
+  }
+
+  const statsObs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting && !e.target.dataset.counted) {
+        e.target.dataset.counted = 'true';
+        animateCounter(e.target);
+      }
+    });
+  }, { threshold: 0.5 });
+  document.querySelectorAll('.stat-num[data-target]').forEach(el => statsObs.observe(el));
+
+  // ── TESTIMONIALS DUPLICATE
+  const track = document.getElementById('testiTrack');
+  track.innerHTML += track.innerHTML;
+
+  // ── CONTACT FORM
+  document.getElementById('submitForm').addEventListener('click', () => {
+    const fname = document.getElementById('fname').value.trim();
+    const femail = document.getElementById('femail').value.trim();
+    const fmessage = document.getElementById('fmessage').value.trim();
+    if (!fname || !femail || !fmessage) {
+      document.getElementById('submitForm').textContent = 'Please fill required fields';
+      setTimeout(() => document.getElementById('submitForm').textContent = 'Send Message →', 2000);
+      return;
+    }
+    document.getElementById('formContent').style.display = 'none';
+    document.getElementById('formSuccess').style.display = 'block';
+  });
+</script>
+</body>
+</html>
